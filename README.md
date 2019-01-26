@@ -18,3 +18,4 @@ TODO
 - Screen resolution
 - phpStorm (specific version 2017.1, not latest)
 - VS Code settings sync?
+- Fix useOptionAsMetaKey setting for Terminal (PlistBuddy not working)
