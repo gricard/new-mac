@@ -16,6 +16,5 @@ This was created for a 2015 MacBook Pro 13" running macOS 10.14.3
 
 TODO
 - Screen resolution
-- phpStorm (specific version 2017.1, not latest)
-- VS Code settings sync?
 - Fix useOptionAsMetaKey setting for Terminal (PlistBuddy not working)
+- It'd be nice if there was ever a way to default the green button on windows to use the old behavior instead of going full screen
