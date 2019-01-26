@@ -180,25 +180,14 @@ echo "Starting brew app install..."
 
 ### Developer Tools
 brew cask install iterm2
-#brew cask install dash
-#brew install ispell
-
-
-### Development
-#brew cask install docker
-#brew install postgresql
-#brew install redis
+brew install node
+brew install yarn
 
 
 ### Command line tools - install new ones, update others to latest version
-#brew install git  # upgrade to latest
-#brew install git-lfs # track large files in git https://github.com/git-lfs/git-lfs
-#brew install wget
-#brew install zsh # zshell
+brew install git  # upgrade to latest
 brew install tmux
-#brew install tree
 brew link curl --force
-#brew install grep --with-default-names
 brew install trash  # move to osx trash instead of rm
 brew install less
 
@@ -286,16 +275,12 @@ dockutil --add /Applications/Visual\ Studio\ Code.app --after Firefox
 # settings we’re about to change
 osascript -e 'tell application "System Preferences" to quit'
 
-
 ##################
 ### Finder, Dock, & Menu Items
 ##################
 
 # Finder: allow quitting via ⌘ + Q; doing so will also hide desktop icons
 defaults write com.apple.finder QuitMenuItem -bool true
-
-# Keep folders on top when sorting by name
-#defaults write com.apple.finder _FXSortFoldersFirst -bool true
 
 # Expand save panel by default
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
@@ -416,24 +401,20 @@ defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 # Disable the all too sensitive backswipe on trackpads
 defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
 
+##################
+### Terminal
+##################
 
-###############################################################################
-# Misc                                                                        #
-###############################################################################
+# Enable option as meta key
+/usr/libexec/PlistBuddy -c "set :Window\ Settings:Basic:useOptionAsMetaKey true" ~/Library/Preferences/com.apple.Terminal.plist
+
 
 #############################################
-### Install dotfiles repo, run link script
+### Install dotfiles repo
 #############################################
-# TODO: 
-# clean up my personal repo to make it public
 # dotfiles for vs code, emacs, gitconfig, oh my zsh, etc. 
-# git clone git@github.com:nnja/dotfiles.git
+# git clone git@github.com:gricard/dotfiles.git
 # cd dotfiles
-# fetch submodules for oh-my-zsh
-# git submodule init && git submodule update && git submodule status
-# make symbolic links and change shell to zshell
-# ./makesymlinks.sh
-# upgrade_oh_my_zsh
 
 
 echo ""
