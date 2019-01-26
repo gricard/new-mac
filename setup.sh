@@ -74,6 +74,18 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 
 ##############################
+# General
+##############################
+
+# Set computer name (as done via System Preferences → Sharing)
+read -p 'Name this computer: ' hostName
+sudo scutil --set ComputerName $hostName
+sudo scutil --set HostName $hostName
+sudo scutil --set LocalHostName $hostName
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string $hostName
+
+
+##############################
 # Prerequisite: Install Brew #
 ##############################
 
