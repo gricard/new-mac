@@ -11,5 +11,4 @@ This was created for a 2015 MacBook Pro 13" running macOS 10.14.3
 TODO
 - Screen resolution
 - phpStorm (specific version 2017.1, not latest)
-- GitHub
 - VS Code settings sync?
