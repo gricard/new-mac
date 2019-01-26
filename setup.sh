@@ -84,6 +84,9 @@ sudo scutil --set HostName $hostName
 sudo scutil --set LocalHostName $hostName
 sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string $hostName
 
+# Menu bar: show remaining battery time (on pre-10.8); hide percentage
+defaults write com.apple.menuextra.battery ShowPercent -string "YES"
+#defaults write com.apple.menuextra.battery ShowTime -string "YES"
 
 ##############################
 # Prerequisite: Install Brew #
@@ -286,9 +289,9 @@ dockutil --add /Applications/Visual\ Studio\ Code.app --after Firefox
 # settings we’re about to change
 osascript -e 'tell application "System Preferences" to quit'
 
-##################
-### Finder, Dock, & Menu Items
-##################
+###############################################################################
+# Finder, Dock, & Menu Items                                                  #
+###############################################################################
 
 # Finder: allow quitting via ⌘ + Q; doing so will also hide desktop icons
 defaults write com.apple.finder QuitMenuItem -bool true
@@ -335,8 +338,51 @@ defaults write com.apple.dock minimize-to-application -bool true
 # Don’t show recent applications in Dock
 defaults write com.apple.dock show-recents -bool false
 
-# Show battery percentage in menu
-defaults write com.apple.menuextra.battery ShowPercent -string "YES"
+# Avoid creating .DS_Store files on network volumes
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+
+# Show the ~/Library folder
+chflags nohidden ~/Library
+
+# Finder: show hidden files by default
+defaults write com.apple.finder AppleShowAllFiles -bool true
+
+# Finder: allow text selection in Quick Look
+defaults write com.apple.finder QLEnableTextSelection -bool true
+
+# Enable snap-to-grid for icons on the desktop and in other icon views
+/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+
+
+###############################################################################
+# Safari & WebKit                                                             #
+###############################################################################
+
+# Set Safari’s home page to `about:blank` for faster loading
+defaults write com.apple.Safari HomePage -string "about:blank"
+
+# Prevent Safari from opening ‘safe’ files automatically after downloading
+defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
+
+# Hide Safari’s bookmarks bar by default
+defaults write com.apple.Safari ShowFavoritesBar -bool false
+
+# Enable Safari’s debug menu
+#defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
+
+# Enable the Develop menu and the Web Inspector in Safari
+defaults write com.apple.Safari IncludeDevelopMenu -bool true
+defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
+defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
+
+###############################################################################
+# Time Machine                                                                #
+###############################################################################
+
+# Prevent Time Machine from prompting to use new hard drives as backup volume
+defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
 ##################
 ### Text Editing / Keyboards
@@ -348,6 +394,13 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+
+# Use plain text mode for new TextEdit documents
+defaults write com.apple.TextEdit RichText -int 0
+
+# Open and save files as UTF-8 in TextEdit
+defaults write com.apple.TextEdit PlainTextEncoding -int 4
+defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 
 ###############################################################################
 # Screenshots / Screen                                                        #
@@ -384,6 +437,12 @@ defaults write NSGlobalDomain com.apple.trackpad.scaling -int 2
 # Turn off trackpad click noise
 defaults write com.apple.AppleMultitouchTrackpad ActuationStrength -int 1
 
+# Disabling press-and-hold for special keys in favor of key repeat
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# Turn off keyboard illumination when computer is not used for 5 minutes
+defaults write com.apple.BezelServices kDimTime -int 300
+
 
 ###############################################################################
 # Mac App Store                                                               #
@@ -412,12 +471,28 @@ defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 # Disable the all too sensitive backswipe on trackpads
 defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
 
-##################
-### Terminal
-##################
+###############################################################################
+# Terminal                                                                    #
+###############################################################################
 
 # Enable option as meta key
 /usr/libexec/PlistBuddy -c "set :Window\ Settings:Basic:useOptionAsMetaKey true" ~/Library/Preferences/com.apple.Terminal.plist
+
+###############################################################################
+# Energy settings                                                             #
+###############################################################################
+
+# turn display off after 10 minutes on battery
+sudo pmset displaysleep 10
+
+# go to sleep after 20 minutes on battery
+sudo pmset sleep 20
+
+# go to sleep after an hour when plugged in
+sudo systemsetup -setsleep 60
+
+# put display to sleep after 10 minutes when plugged in
+sudo systemsetup -setdisplaysleep 10
 
 
 #############################################
