@@ -2,6 +2,12 @@
 
 My personal installation script for a new Mac.
 
+To start a new setup, simply run:
+
+```shell
+bash -c "`curl -L https://raw.githubusercontent.com/gricard/new-mac/master/setup.sh`"
+```
+
 Note, this sets up an extremely opinionated and highly personalized installation, with my preferences and dotfiles. Please adjust as needed!
 
 Based on https://github.com/nnja/new-computer
