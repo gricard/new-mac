@@ -243,13 +243,14 @@ dockutil --remove Messages --no-restart
 dockutil --remove FaceTime --no-restart
 dockutil --remove News --no-restart
 dockutil --remove iTunes --no-restart
+dockutil --remove App\ Store --no-restart
 dockutil --add /Applications/Google\ Chrome.app --after Safari --no-restart
-dockutil --add /Applications/Firefox.app --after Google\ Chrome
+dockutil --add /Applications/Firefox.app --after Google\ Chrome --no-restart
+dockutil --add /Applications/Visual\ Studio\ Code.app --after Firefox --no-restart
 dockutil --add /Applications/Utilities/Terminal.app --after Firefox --no-restart
 dockutil --add /Applications/iTerm.app --after Terminal --no-restart
 dockutil --add /Applications/Utilities/Disk\ Utility.app --after Terminal --no-restart
-dockutil --add /Applications/Utilities/Activity\ Monitor.app --after Diskutil --no-restart
-dockutil --add /Applications/Visual\ Studio\ Code.app --after Firefox 
+dockutil --add /Applications/Utilities/Activity\ Monitor.app --after Diskutil
 ### make sure the last dockutil call does not have --no-restart
 
 #############################################
@@ -476,7 +477,8 @@ defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
 ###############################################################################
 
 # Enable option as meta key
-/usr/libexec/PlistBuddy -c "set :Window\ Settings:Basic:useOptionAsMetaKey true" ~/Library/Preferences/com.apple.Terminal.plist
+# This does not seem to work. set doesn't work either
+/usr/libexec/PlistBuddy -c "add :Window\ Settings:Basic:useOptionAsMetaKey bool true" ~/Library/Preferences/com.apple.Terminal.plist
 
 ###############################################################################
 # Energy settings                                                             #
@@ -502,7 +504,6 @@ sudo systemsetup -setdisplaysleep 10
 # git clone git@github.com:gricard/dotfiles.git
 # cd dotfiles
 
-
 echo ""
 cecho "Done!" $cyan
 echo ""
@@ -518,3 +519,12 @@ read response
 if [ "$response" != "${response#[Yy]}" ] ;then
     softwareupdate -i -a --restart
 fi
+
+
+echo
+echo
+echo "Additional manual setup (for now):"
+echo " - adjust the screen resolution manually (for now)"
+echo " - turn on 'Use option as meta key' in Terminal"
+echo " - enable full disk access, etc. for iTerm"
+echo
