@@ -147,10 +147,9 @@ SSH_KEY=`cat ~/.ssh/id_rsa.pub`
 
 for ((i=0; i<retries; i++)); do
       read -p 'GitHub username: ' ghusername
-      read -p 'Machine name: ' ghtitle
       read -sp 'GitHub personal token: ' ghtoken
 
-      gh_status_code=$(curl -o /dev/null -s -w "%{http_code}\n" -u "$ghusername:$ghtoken" -d '{"title":"'$ghtitle'","key":"'"$SSH_KEY"'"}' 'https://api.github.com/user/keys')
+      gh_status_code=$(curl -o /dev/null -s -w "%{http_code}\n" -u "$ghusername:$ghtoken" -d '{"title":"'$hostName'","key":"'"$SSH_KEY"'"}' 'https://api.github.com/user/keys')
 
       if (( $gh_status_code -eq == 201))
       then
