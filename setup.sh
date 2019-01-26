@@ -527,4 +527,7 @@ echo "Additional manual setup (for now):"
 echo " - adjust the screen resolution manually (for now)"
 echo " - turn on 'Use option as meta key' in Terminal"
 echo " - enable full disk access, etc. for iTerm"
+echo " - install the Sync Settings VS Code extension and connect to your gist!"
+echo " - download phpstorm 2017.1: https://confluence.jetbrains.com/display/PhpStorm/Previous+PhpStorm+Releases"
+echo "   - don't modify the bin/phpstorm.vmoptions memory usage settings until after you open it once or it gets corrupted!"
 echo
