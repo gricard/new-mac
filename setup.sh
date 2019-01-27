@@ -181,17 +181,6 @@ git config --global user.name "$gitName"
 
 echo "Starting brew app install..."
 
-### Window Management
-# Todo: Try Divvy and spectacles in the future
-#brew cask install sizeup  # window manager
-
-# Start SizeUp at login
-#defaults write com.irradiatedsoftware.SizeUp StartAtLogin -bool true
-
-# Don’t show the preferences window on next start
-#defaults write com.irradiatedsoftware.SizeUp ShowPrefsOnNextStart -bool false
-
-
 ### Developer Tools
 brew cask install iterm2
 brew install node
@@ -364,7 +353,8 @@ defaults write com.apple.finder QLEnableTextSelection -bool true
 #/usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.symbolichotkeys.plist -c "Set AppleSymbolicHotKeys:65:enabled false"
 
 # start spectacle on login (find a way to do this, it doesn't work)
-#defaults write com.divisiblebyzero.Spectacle StartAtLogin -bool true
+osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
+
 
 ###############################################################################
 # Safari & WebKit                                                             #
@@ -442,7 +432,7 @@ defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
 # Increase trackpad speed
-defaults write NSGlobalDomain com.apple.trackpad.scaling -int 2
+defaults write NSGlobalDomain com.apple.trackpad.scaling -int 2.5
 
 # Turn off trackpad click noise
 defaults write com.apple.AppleMultitouchTrackpad ActuationStrength -int 1
