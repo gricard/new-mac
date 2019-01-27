@@ -250,31 +250,31 @@ dockutil --add /Applications/Utilities/Activity\ Monitor.app --after Diskutil
 #echo "Installing apps from the App Store..."
 
 ### find app ids with: mas search "app name"
-#brew install mas
+brew install mas
 
 ### Mas login is currently broken on mojave. See:
 ### Login manually for now.
 
-#cecho "Need to log in to App Store manually to install apps with mas...." $red
-#echo "Opening App Store. Please login."
-#open "/Applications/App Store.app"
-#echo "Is app store login complete.(y/n)? "
-#read response
-#if [ "$response" != "${response#[Yy]}" ]
-#then
-#	mas install 907364780  # Tomato One - Pomodoro timer
-#	mas install 485812721  # Tweetdeck
-#	mas install 668208984  # GIPHY Capture. The GIF Maker (For recording my screen as gif)
-#	mas install 1351639930 # Gifski, convert videos to gifs
-#	mas install 414030210  # Limechat, IRC app.
-#else
-#	cecho "App Store login not complete. Skipping installing App Store Apps" $red
-#fi
+cecho "Need to log in to App Store manually to install apps with mas...." $red
+echo "Opening App Store. Please login."
+open "/Applications/App Store.app"
+echo "Is app store login complete.(y/n)? "
+read response
+if [ "$response" != "${response#[Yy]}" ]
+then
+  mas install 497799835 # xcode
+else
+	cecho "App Store login not complete. Skipping installing App Store Apps" $red
+fi
 
 
 #############################################
 ### Set OSX Preferences - Borrowed from https://github.com/mathiasbynens/dotfiles/blob/master/.macos
 #############################################
+
+# fix xcodebuild on command line
+# see: https://stackoverflow.com/questions/17980759/xcode-select-active-developer-directory-error/17980786#17980786
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
