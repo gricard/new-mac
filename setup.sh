@@ -214,6 +214,7 @@ brew cask install google-chrome
 brew cask install firefox
 brew cask install alfred
 brew cask install dropbox
+brew cask install spectacle
 
 
 ### Quicklook plugins https://github.com/sindresorhus/quick-look-plugins
@@ -356,6 +357,14 @@ defaults write com.apple.finder QLEnableTextSelection -bool true
 /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 
+# Remove cmd-space shortcut from Spotlight so we can use it for Alfred
+/usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.symbolichotkeys.plist -c "Set AppleSymbolicHotKeys:64:enabled false"
+
+# turn off the finder search shortcut also
+#/usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.symbolichotkeys.plist -c "Set AppleSymbolicHotKeys:65:enabled false"
+
+# start spectacle on login (find a way to do this, it doesn't work)
+#defaults write com.divisiblebyzero.Spectacle StartAtLogin -bool true
 
 ###############################################################################
 # Safari & WebKit                                                             #
@@ -505,7 +514,19 @@ sudo systemsetup -setdisplaysleep 10
 # cd dotfiles
 
 echo ""
-cecho "Done!" $cyan
+echo "Done!" $cyan
+echo
+echo
+echo "Additional manual setup (for now):"
+echo " - adjust the screen resolution manually (for now)"
+echo " - turn on 'Use option as meta key' in Terminal"
+echo " - enable full disk access, etc. for iTerm"
+echo " - install the Sync Settings VS Code extension and connect to your gist!"
+echo " - download phpstorm 2017.1: https://confluence.jetbrains.com/display/PhpStorm/Previous+PhpStorm+Releases"
+echo "   - don't modify the bin/phpstorm.vmoptions memory usage settings until after you open it once or it gets corrupted!"
+echo " - set alfred to use cmd-space in prefs, and to enable accessibility controls & full disk access"
+echo " - enable start at login for spectacle"
+echo
 echo ""
 echo ""
 cecho "################################################################################" $white
@@ -519,15 +540,3 @@ read response
 if [ "$response" != "${response#[Yy]}" ] ;then
     softwareupdate -i -a --restart
 fi
-
-
-echo
-echo
-echo "Additional manual setup (for now):"
-echo " - adjust the screen resolution manually (for now)"
-echo " - turn on 'Use option as meta key' in Terminal"
-echo " - enable full disk access, etc. for iTerm"
-echo " - install the Sync Settings VS Code extension and connect to your gist!"
-echo " - download phpstorm 2017.1: https://confluence.jetbrains.com/display/PhpStorm/Previous+PhpStorm+Releases"
-echo "   - don't modify the bin/phpstorm.vmoptions memory usage settings until after you open it once or it gets corrupted!"
-echo
