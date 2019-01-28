@@ -538,6 +538,7 @@ echo " - install the Sync Settings VS Code extension and connect to your gist!"
 echo " - download phpstorm 2017.1: https://confluence.jetbrains.com/display/PhpStorm/Previous+PhpStorm+Releases"
 echo "   - don't modify the bin/phpstorm.vmoptions memory usage settings until after you open it once or it gets corrupted!"
 echo " - set alfred to use cmd-space in prefs, and to enable accessibility controls & full disk access"
+echo " - Citrix plugin: https://www.citrix.com/downloads/citrix-receiver/mac/receiver-for-mac-latest.html"
 echo
 echo ""
 echo ""
