@@ -202,6 +202,7 @@ brew cask install visual-studio-code
 ### Productivity
 brew cask install google-chrome
 brew cask install firefox
+brew cask install brave-browser
 brew cask install alfred
 brew cask install dropbox
 brew cask install spectacle
@@ -355,6 +356,27 @@ defaults write com.apple.finder QLEnableTextSelection -bool true
 
 # start spectacle on login (find a way to do this, it doesn't work)
 osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
+
+###############################################################################
+# Misc / System                                                               #
+###############################################################################
+
+# Disable the crash reporter
+#defaults write com.apple.CrashReporter DialogType -string "none"
+
+# Reveal IP address, hostname, OS version, etc. when clicking the clock
+# in the login window
+sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
+
+# Restart automatically if the computer freezes
+# sudo systemsetup -setrestartfreeze on
+
+# Never go into computer sleep mode
+#sudo systemsetup -setcomputersleep Off > /dev/null
+
+# Disable Notification Center and remove the menu bar icon
+# launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
+
 
 
 ###############################################################################
@@ -516,7 +538,6 @@ echo " - install the Sync Settings VS Code extension and connect to your gist!"
 echo " - download phpstorm 2017.1: https://confluence.jetbrains.com/display/PhpStorm/Previous+PhpStorm+Releases"
 echo "   - don't modify the bin/phpstorm.vmoptions memory usage settings until after you open it once or it gets corrupted!"
 echo " - set alfred to use cmd-space in prefs, and to enable accessibility controls & full disk access"
-echo " - enable start at login for spectacle"
 echo
 echo ""
 echo ""
