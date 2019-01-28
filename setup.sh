@@ -199,14 +199,16 @@ brew install less
 brew cask install visual-studio-code
 #brew cask install phpstorm #installs 2018.x
 
-### Productivity
+### Browsers
 brew cask install google-chrome
 brew cask install firefox
 brew cask install brave-browser
+
+### Productivity
 brew cask install alfred
 brew cask install dropbox
 brew cask install spectacle
-
+brew cask install bartender
 
 ### Quicklook plugins https://github.com/sindresorhus/quick-look-plugins
 brew cask install qlcolorcode # syntax highlighting in preview
@@ -499,7 +501,7 @@ defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
 ###############################################################################
 
 # Enable option as meta key
-# This does not seem to work. set doesn't work either
+# This does not seem to work. 'set' instead of 'add' doesn't work either
 /usr/libexec/PlistBuddy -c "add :Window\ Settings:Basic:useOptionAsMetaKey bool true" ~/Library/Preferences/com.apple.Terminal.plist
 
 ###############################################################################
@@ -539,6 +541,7 @@ echo " - download phpstorm 2017.1: https://confluence.jetbrains.com/display/PhpS
 echo "   - don't modify the bin/phpstorm.vmoptions memory usage settings until after you open it once or it gets corrupted!"
 echo " - set alfred to use cmd-space in prefs, and to enable accessibility controls & full disk access"
 echo " - Citrix plugin: https://www.citrix.com/downloads/citrix-receiver/mac/receiver-for-mac-latest.html"
+echo " - Install React Dev Tools in Chrome, Firefox, etc."
 echo
 echo ""
 echo ""
