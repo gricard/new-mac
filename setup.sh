@@ -356,8 +356,22 @@ defaults write com.apple.finder QLEnableTextSelection -bool true
 # turn off the finder search shortcut also
 #/usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.symbolichotkeys.plist -c "Set AppleSymbolicHotKeys:65:enabled false"
 
+# credit for these scripts: https://gist.github.com/kaloprominat/6111584
 # start spectacle on login (find a way to do this, it doesn't work)
 osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
+# delete login item
+#osascript -e 'tell application "System Events" to delete login item "itemname"'
+# list loginitems
+#osascript -e 'tell application "System Events" to get the name of every login item'
+
+# start Bartender at login also
+# I can't figure out how Bartender sets this up. It's not adding it to the System Events login items
+# and it's not adding it to loginwindow's defaults, either.
+# this does not work:
+# defaults write loginwindow AutoLaunchedApplicationDictionary -array-add '{ "Name" = "Notes" ; "Path" = "/Applications/Bartender\ 3.app"; "Hide" = 0; }'
+# but this does, although it does not trigger the "launch at login" checkbox in Bartender's preferences
+osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Bartender\ 3.app", hidden:false}'
+
 
 ###############################################################################
 # Misc / System                                                               #
