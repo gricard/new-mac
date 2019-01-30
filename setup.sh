@@ -218,6 +218,9 @@ brew cask install quicklook-json  # preview json files
 brew cask install epubquicklook  # preview epubs, make nice icons
 brew cask install quicklook-csv  # preview csvs
 
+# Utilities
+brew cask install homebrew/cask-drivers/drobo-dashboard
+
 ### Run Brew Cleanup
 brew cleanup
 
