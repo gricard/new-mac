@@ -397,80 +397,6 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo Hos
 # Disable Notification Center and remove the menu bar icon
 # launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
 
-
-###############################################################################
-# iTerm 2                                                                     #
-###############################################################################
-# this is a bit of a messy process to ensure that iTerm will use the left option key as the meta key
-# but it is the only way I found to do it with consistently reproducible results
-# if you don't do the syncs, defaults read calls and waiting, then it does not always honor the settings
-# this was a pain in the ass to figure out - GR
-echo "Attempting to setup defaults for iTerm now. The app will open while this process runs."
-echo "Please do not touch the keyboard or mouse until this process completes."
-sleep 1
-# the defaults file is empty right now
-# create initial defaults for iterm so it will not ask when we quit it with this script
-defaults write com.googlecode.iterm2 PromptOnQuit -bool false
-# and turn on automatic checks so we're not bothered with that dialog either
-defaults write com.googlecode.iterm2 SUEnableAutomaticChecks -int 1
-# start iterm and exit it, so that it fills in the rest of the defaults
-open /Applications/iTerm.app &
-# wait for iTerm to start up...
-echo "Wait for iTerm to setup its default prefs"
-sleep 3
-# flush filesystem (not sure if this even does anything)
-sync
-# see what it wrote (in case a read causes anything cached to be flushed)
-numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
-#echo "num defaults read: $numDefaults"
-# kill it since the defaults plist should be filled in now
-killall iTerm2
-# wait for it to die
-pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
-#echo "Pids: $pids"
-while [ $pids -gt 0 ]
-do
-  #echo "still running..."
-  sleep 1
-  pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
-done
-# force FS flush
-sync
-# now we can alter prefs via PlistBuddy
-ITERM=$HOME/Library/Preferences/com.googlecode.iterm2.plist
-# set the left option key to Esc+ (so it will work as meta key properly)
-# for some reason the defaults plist is not written immediately,
-# so we have to keep trying to update it with PlistBuddy
-echo -n "Attempting to set meta key for iTerm2"
-counter=0
-maxTries=20
-while [ $counter -lt $maxTries ]
-do
-  echo -n "."
-  sleep 1
-  # credit: https://raw.githubusercontent.com/therockstorm/dotfiles/master/init.sh
-  # and for some reason the stderr redirect here still doesn't always redirect the error output... awesome.
-  /usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Option Key Sends" 2' $ITERM 2>&1>/dev/null
-  if [ $? -eq 0 ]
-  then
-    echo " done"
-    break
-  fi
-  counter=`expr $counter + 1`
-done
-# There were still cases where it was in the defaults plist, but not honored by the app
-# so we do a few more things here to try and ensure that the defaults are actually honored
-#
-# let's try a sync again just in case
-sync
-# and another read to see if we reset any cache
-numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
-#echo "num defaults read: $numDefaults"
-# NOW the setting should be saved properly
-
-# reset the close confirmation dialog, since I do want it to ask
-defaults write com.googlecode.iterm2 PromptOnQuit -bool true
-
 ###############################################################################
 # Safari & WebKit                                                             #
 ###############################################################################
@@ -587,12 +513,140 @@ defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
 
 ###############################################################################
+# iTerm 2                                                                     #
+###############################################################################
+# this is a bit of a messy process to ensure that iTerm will use the left option key as the meta key
+# but it is the only way I found to do it with consistently reproducible results
+# if you don't do the syncs, defaults read calls and waiting, then it does not always honor the settings
+# this was a pain in the ass to figure out - GR
+echo "Attempting to setup defaults for iTerm now. The app will open while this process runs."
+echo "Please do not touch the keyboard or mouse until this process completes."
+sleep 1
+# the defaults file is empty right now
+# create initial defaults for iterm so it will not ask when we quit it with this script
+defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+# and turn on automatic checks so we're not bothered with that dialog either
+defaults write com.googlecode.iterm2 SUEnableAutomaticChecks -int 1
+# start iterm and exit it, so that it fills in the rest of the defaults
+open /Applications/iTerm.app &
+# wait for iTerm to start up...
+echo "Wait for iTerm to setup its default prefs"
+sleep 3
+# flush filesystem (not sure if this even does anything)
+sync
+# see what it wrote (in case a read causes anything cached to be flushed)
+numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
+#echo "num defaults read: $numDefaults"
+# kill it since the defaults plist should be filled in now
+killall iTerm2
+# wait for it to die
+pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
+#echo "Pids: $pids"
+while [ $pids -gt 0 ]
+do
+  #echo "still running..."
+  sleep 1
+  pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
+done
+# force FS flush
+sync
+# now we can alter prefs via PlistBuddy
+ITERM=$HOME/Library/Preferences/com.googlecode.iterm2.plist
+# set the left option key to Esc+ (so it will work as meta key properly)
+# for some reason the defaults plist is not written immediately,
+# so we have to keep trying to update it with PlistBuddy
+echo -n "Attempting to set meta key for iTerm2"
+counter=0
+maxTries=20
+while [ $counter -lt $maxTries ]
+do
+  echo -n "."
+  sleep 1
+  # credit: https://raw.githubusercontent.com/therockstorm/dotfiles/master/init.sh
+  # and for some reason the stderr redirect here still doesn't always redirect the error output... awesome.
+  /usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Option Key Sends" 2' $ITERM 2>&1>/dev/null
+  if [ $? -eq 0 ]
+  then
+    echo " done"
+    break
+  fi
+  counter=`expr $counter + 1`
+done
+# There were still cases where it was in the defaults plist, but not honored by the app
+# so we do a few more things here to try and ensure that the defaults are actually honored
+#
+# let's try a sync again just in case
+sync
+# and another read to see if we reset any cache
+numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
+#echo "num defaults read: $numDefaults"
+# NOW the setting should be saved properly
+
+# reset the close confirmation dialog, since I do want it to ask
+defaults write com.googlecode.iterm2 PromptOnQuit -bool true
+
+
+###############################################################################
 # Terminal                                                                    #
 ###############################################################################
 
 # Enable option as meta key
-# This does not seem to work. 'set' instead of 'add' doesn't work either
-/usr/libexec/PlistBuddy -c "add :Window\ Settings:Basic:useOptionAsMetaKey bool true" ~/Library/Preferences/com.apple.Terminal.plist
+# use the same trick that we did for iTerm...
+echo "Attempting to setup defaults for Terminal now. The app will open while this process runs."
+echo "Please do not touch the keyboard or mouse until this process completes."
+sleep 1
+# the defaults file is empty right now
+# start Terminal and exit it, so that it fills in the rest of the defaults
+open /Applications/Utilities/Terminal.app &
+# wait for Terminal to start up...
+echo "Wait for Terminal to setup its default prefs"
+sleep 3
+# flush filesystem (not sure if this even does anything)
+sync
+# see what it wrote (in case a read causes anything cached to be flushed)
+numDefaults=`defaults read com.apple.Terminal | wc -l`
+#echo "num defaults read: $numDefaults"
+# kill it since the defaults plist should be filled in now
+killall Terminal
+# wait for it to die
+pids=`ps uawwx | grep Terminal | grep -v grep | wc -l`
+#echo "Pids: $pids"
+while [ $pids -gt 0 ]
+do
+  #echo "still running..."
+  sleep 1
+  pids=`ps uawwx | grep Terminal | grep -v grep | wc -l`
+done
+# force FS flush
+sync
+# now we can alter prefs via PlistBuddy
+# set the left option key to Esc+ (so it will work as meta key properly)
+# for some reason the defaults plist is not written immediately,
+# so we have to keep trying to update it with PlistBuddy
+echo -n "Attempting to set meta key for Terminal"
+counter=0
+maxTries=20
+while [ $counter -lt $maxTries ]
+do
+  echo -n "."
+  sleep 1
+  /usr/libexec/PlistBuddy -c "Add :Window\ Settings:Basic:useOptionAsMetaKey bool true" ~/Library/Preferences/com.apple.Terminal.plist
+  if [ $? -eq 0 ]
+  then
+    echo " done"
+    break
+  fi
+  counter=`expr $counter + 1`
+done
+# There were still cases where it was in the defaults plist, but not honored by the app
+# so we do a few more things here to try and ensure that the defaults are actually honored
+#
+# let's try a sync again just in case
+sync
+# and another read to see if we reset any cache
+numDefaults=`defaults read com.apple.Terminal | wc -l`
+#echo "num defaults read: $numDefaults"
+# NOW the setting should be saved properly
 
 ###############################################################################
 # Energy settings                                                             #
@@ -624,7 +678,6 @@ echo
 echo
 echo "Additional manual setup (for now):"
 echo " - adjust the screen resolution manually (for now)"
-echo " - turn on 'Use option as meta key' in Terminal"
 echo " - enable full disk access, etc. for iTerm"
 echo " - install the Sync Settings VS Code extension and connect to your gist!"
 echo " - download phpstorm 2017.1: https://confluence.jetbrains.com/display/PhpStorm/Previous+PhpStorm+Releases"
