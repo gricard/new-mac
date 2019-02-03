@@ -1,5 +1,3 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/abc3714f-15f7-415d-a790-d17a958128fe/deploy-status)](https://app.netlify.com/sites/gabriel-run/deploys)
-
 # Setting up a new Mac
 
 My personal installation script for a new Mac.
