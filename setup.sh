@@ -243,7 +243,8 @@ dockutil --remove iTunes --no-restart
 dockutil --remove App\ Store --no-restart
 dockutil --add /Applications/Google\ Chrome.app --after Safari --no-restart
 dockutil --add /Applications/Firefox.app --after Google\ Chrome --no-restart
-dockutil --add /Applications/Visual\ Studio\ Code.app --after Firefox --no-restart
+dockutil --add /Applications/Brave\ Browser.app --after Firefox--no-restart
+dockutil --add /Applications/Visual\ Studio\ Code.app --after Brave\ Browser --no-restart
 dockutil --add /Applications/Utilities/Terminal.app --after Firefox --no-restart
 dockutil --add /Applications/iTerm.app --after Terminal --no-restart
 dockutil --add /Applications/Utilities/Disk\ Utility.app --after Terminal --no-restart
@@ -400,7 +401,15 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo Hos
 ###############################################################################
 # iTerm 2                                                                     #
 ###############################################################################
-# create initial defaults for iterm so it will not ask when we quit it
+# this is a bit of a messy process to ensure that iTerm will use the left option key as the meta key
+# but it is the only way I found to do it with consistently reproducible results
+# if you don't do the syncs, defaults read calls and waiting, then it does not always honor the settings
+# this was a pain in the ass to figure out - GR
+echo "Attempting to setup defaults for iTerm now. The app will open while this process runs."
+echo "Please do not touch the keyboard or mouse until this process completes."
+sleep 1
+# the defaults file is empty right now
+# create initial defaults for iterm so it will not ask when we quit it with this script
 defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 # and turn on automatic checks so we're not bothered with that dialog either
 defaults write com.googlecode.iterm2 SUEnableAutomaticChecks -int 1
@@ -409,17 +418,24 @@ open /Applications/iTerm.app &
 # wait for iTerm to start up...
 echo "Wait for iTerm to setup its default prefs"
 sleep 3
+# flush filesystem (not sure if this even does anything)
+sync
+# see what it wrote (in case a read causes anything cached to be flushed)
+numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
+#echo "num defaults read: $numDefaults"
 # kill it since the defaults plist should be filled in now
 killall iTerm2
 # wait for it to die
 pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
-echo "Pids: $pids"
+#echo "Pids: $pids"
 while [ $pids -gt 0 ]
 do
-  echo "still running..."
+  #echo "still running..."
   sleep 1
   pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
 done
+# force FS flush
+sync
 # now we can alter prefs via PlistBuddy
 ITERM=$HOME/Library/Preferences/com.googlecode.iterm2.plist
 # set the left option key to Esc+ (so it will work as meta key properly)
@@ -433,6 +449,7 @@ do
   echo -n "."
   sleep 1
   # credit: https://raw.githubusercontent.com/therockstorm/dotfiles/master/init.sh
+  # and for some reason the stderr redirect here still doesn't always redirect the error output... awesome.
   /usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Option Key Sends" 2' $ITERM 2>&1>/dev/null
   if [ $? -eq 0 ]
   then
@@ -441,6 +458,18 @@ do
   fi
   counter=`expr $counter + 1`
 done
+# There were still cases where it was in the defaults plist, but not honored by the app
+# so we do a few more things here to try and ensure that the defaults are actually honored
+#
+# let's try a sync again just in case
+sync
+# and another read to see if we reset any cache
+numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
+#echo "num defaults read: $numDefaults"
+# NOW the setting should be saved properly
+
+# reset the close confirmation dialog, since I do want it to ask
+defaults write com.googlecode.iterm2 PromptOnQuit -bool true
 
 ###############################################################################
 # Safari & WebKit                                                             #
