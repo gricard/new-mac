@@ -397,6 +397,50 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo Hos
 # launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
 
 
+###############################################################################
+# iTerm 2                                                                     #
+###############################################################################
+# create initial defaults for iterm so it will not ask when we quit it
+defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+# and turn on automatic checks so we're not bothered with that dialog either
+defaults write com.googlecode.iterm2 SUEnableAutomaticChecks -int 1
+# start iterm and exit it, so that it fills in the rest of the defaults
+open /Applications/iTerm.app &
+# wait for iTerm to start up...
+echo "Wait for iTerm to setup its default prefs"
+sleep 3
+# kill it since the defaults plist should be filled in now
+killall iTerm2
+# wait for it to die
+pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
+echo "Pids: $pids"
+while [ $pids -gt 0 ]
+do
+  echo "still running..."
+  sleep 1
+  pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
+done
+# now we can alter prefs via PlistBuddy
+ITERM=$HOME/Library/Preferences/com.googlecode.iterm2.plist
+# set the left option key to Esc+ (so it will work as meta key properly)
+# for some reason the defaults plist is not written immediately,
+# so we have to keep trying to update it with PlistBuddy
+echo -n "Attempting to set meta key for iTerm2"
+counter=0
+maxTries=20
+while [ $counter -lt $maxTries ]
+do
+  echo -n "."
+  sleep 1
+  # credit: https://raw.githubusercontent.com/therockstorm/dotfiles/master/init.sh
+  /usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Option Key Sends" 2' $ITERM 2>&1>/dev/null
+  if [ $? -eq 0 ]
+  then
+    echo " done"
+    break
+  fi
+  counter=`expr $counter + 1`
+done
 
 ###############################################################################
 # Safari & WebKit                                                             #
