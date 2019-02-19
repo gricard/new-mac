@@ -186,8 +186,9 @@ brew cask install iterm2
 brew cask install dash
 brew install node
 brew install yarn
-npm i -g --no-optional gatsby-cli
 brew cask install virtualbox
+npm i -g --no-optional gatsby-cli
+npm install -g @aws-amplify/cli@multienv
 
 ### Command line tools - install new ones, update others to latest version
 brew install git  # upgrade to latest
@@ -655,7 +656,9 @@ numDefaults=`defaults read com.apple.Terminal | wc -l`
 
 # better battery life while sleeping
 # default for portables is "hibernatemode 3"
-sudo pmset -a hibernatemode 25 standby 0 autopoweroff 0
+# although, this makes it take much longer to wake from sleep, and sometimes it logs out entirely
+# benefits are not apparent
+#sudo pmset -a hibernatemode 25 standby 0 autopoweroff 0
 
 # turn display off after 10 minutes on battery
 sudo pmset displaysleep 10
