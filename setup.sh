@@ -693,7 +693,9 @@ echo "   - don't modify the bin/phpstorm.vmoptions memory usage settings until a
 echo " - set alfred to use cmd-space in prefs, and to enable accessibility controls & full disk access"
 echo " - Citrix plugin: https://www.citrix.com/downloads/citrix-receiver/mac/receiver-for-mac-latest.html"
 echo " - Install React Dev Tools in Chrome, Firefox, etc."
-wcho " - Setup Time Machine with Drobo"
+echo " - Setup Time Machine with Drobo"
+echo " - System Prefs -> Bluetooth -> Advanced -> Allow Bluetooth devices to wake this computer"
+echo " - System Prefs -> Notifications -> Turn on Do Not Disturb... -> When the display is sleeping"
 echo
 echo ""
 echo ""
