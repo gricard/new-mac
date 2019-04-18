@@ -677,7 +677,30 @@ sudo systemsetup -setsleep 60
 sudo systemsetup -setdisplaysleep 10
 
 # Turn off feature to preserve battery life while sleeping 
+# https://discussions.apple.com/thread/8368663
 sudo pmset -b tcpkeepalive 0
+
+# Edit Mac-specific config to turn off tcpkeepalive and do-not-disturb while sleeping
+# keeps enhanced notifications from waking mac while sleeping, draining battery
+# Related: 
+# https://forums.macrumors.com/threads/psa-if-your-2015-or-2016-mbp-has-some-battery-drain-while-sleeping-here-is-the-fix.2026702/
+# https://apple.stackexchange.com/questions/253776/macbook-pro-13-with-retina-display-consumes-10-battery-overnight-with-the-lid-c
+# https://support.apple.com/en-us/HT201960
+csrutil status | grep enabled > /dev/null
+if [ $? -eq 0 ]
+then
+  echo "Cannot disable tcpkeepalive properly"
+  echo "Please reboot and hold command-r to start the recovery tool"
+  echo "When it loads, open the terminal and type `csrutil disable` and then reboot and try again"
+  echo "When finished, reboot into the recovery tool, and enter 'csrutil enable' in the terminal again"
+else
+  MODEL=`ioreg -l | awk '/board-id/{print $4}' | sed 's/[<">]//g'`
+  echo "Altering configuration for model $MODEL"
+  echo "Disable network wake when sleeping"
+  sudo /usr/libexec/PlistBuddy -c "Set :IOPlatformPowerProfile:TCPKeepAliveDuringSleep false" /System/Library/Extensions/IOPlatformPluginFamily.kext/Contents/PlugIns/X86PlatformPlugin.kext/Contents/Resources/$MODEL.plist
+  echo "Enable Do Not Disturb while display is asleep"
+  sudo /usr/libexec/PlistBuddy -c "Set :IOPlatformPowerProfile:DNDWhileDisplaySleeps true" /System/Library/Extensions/IOPlatformPluginFamily.kext/Contents/PlugIns/X86PlatformPlugin.kext/Contents/Resources/$MODEL.plist
+fi
 
 #############################################
 ### Install dotfiles repo
