@@ -676,6 +676,8 @@ sudo systemsetup -setsleep 60
 # put display to sleep after 10 minutes when plugged in
 sudo systemsetup -setdisplaysleep 10
 
+# Turn off feature to preserve battery life while sleeping 
+sudo pmset -b tcpkeepalive 0
 
 #############################################
 ### Install dotfiles repo
