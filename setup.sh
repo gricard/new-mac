@@ -666,6 +666,10 @@ sudo pmset displaysleep 10
 # go to sleep after 20 minutes on battery
 sudo pmset sleep 20
 
+# turn off option that wakes mac when devices with same apple id are near
+# https://www.reddit.com/r/hackintosh/comments/9jfa8w/mojave_new_pmset_options/
+sudo pmset -a proximitywake 0
+
 # go to sleep after an hour when plugged in
 sudo systemsetup -setsleep 60
 
