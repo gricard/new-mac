@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#                    _           _        _ _ 
+#                    _           _        _ _
 #  ___  _____  __   (_)_ __  ___| |_ __ _| | |
 # / _ \/ __\ \/ /   | | '_ \/ __| __/ _` | | |
 #| (_) \__ \>  <    | | | | \__ \ || (_| | | |
@@ -187,6 +187,7 @@ brew cask install dash
 brew install node
 brew install yarn
 brew cask install virtualbox
+brew install awscli
 npm i -g --no-optional gatsby-cli
 npm install -g @aws-amplify/cli@multienv
 
@@ -197,7 +198,7 @@ brew install tmux
 brew install trash  # move to osx trash instead of rm
 brew install less
 
-### Dev Editors 
+### Dev Editors
 brew cask install visual-studio-code
 #brew cask install phpstorm #installs 2018.x
 
@@ -654,17 +655,54 @@ numDefaults=`defaults read com.apple.Terminal | wc -l`
 # Energy settings                                                             #
 ###############################################################################
 
-# better battery life while sleeping
+#### better battery life while sleeping
+#
+# pmset -a = all power modes , -b = battery , -c = charger / wall power
+#
+# More info:
+# https://www.lifewire.com/change-mac-sleep-settings-2260804
+# https://www.dssw.co.uk/reference/pmset.html
+#
+# hibernatemode 3 = writes memory to disk, but keeps ram powered , 25 = writes to disk and does not power memory (takes longer to wake)
+#
 # default for portables is "hibernatemode 3"
+#sudo pmset -a hibernatemode 25 standby 0 autopoweroff 0
 # although, this makes it take much longer to wake from sleep, and sometimes it logs out entirely
 # benefits are not apparent
-#sudo pmset -a hibernatemode 25 standby 0 autopoweroff 0
+
+# so stick with mode 3
+sudo pmset -a hibernatemode 3
+
+# tell mac to hibernate after a set time interval
+sudo pmset -a standby 1
+# battery % considered "high" (default)
+#sudo pmset -a highstandbythreshold 50
+# num seconds to delay before hibernating when mac is put to sleep and battery has more than 'highstandbythreshold' % battery
+sudo pmset -a standbydelayhigh 600 # wait 10 minutes and then hibernate
+# num seconds to delay before hibernating when battery is < 50%
+sudo pmset -a standbydelaylow 120 # wait 2 minutes on low power
+
+# do not automatically hibernate
+sudo pmset -a autopoweroff 0
+
+# do not wake on "magic packet" over ethernet
+sudo pmset -a womp 0
+
+# do not wake when power source changes
+sudo pmset -a acwake 0
+
+# no sharing network services when sleeping
+sudo pmset -a networkoversleep 0
+
+# turn off Power Nap
+# more info here: https://www.howtogeek.com/277742/what-is-power-nap-in-macos/
+sudo pmset -a powernap 0
 
 # turn display off after 10 minutes on battery
-sudo pmset displaysleep 10
+sudo pmset -b displaysleep 10
 
 # go to sleep after 20 minutes on battery
-sudo pmset sleep 20
+sudo pmset -b sleep 20
 
 # turn off option that wakes mac when devices with same apple id are near
 # https://www.reddit.com/r/hackintosh/comments/9jfa8w/mojave_new_pmset_options/
@@ -676,13 +714,13 @@ sudo systemsetup -setsleep 60
 # put display to sleep after 10 minutes when plugged in
 sudo systemsetup -setdisplaysleep 10
 
-# Turn off feature to preserve battery life while sleeping 
+# Turn off feature to preserve battery life while sleeping
 # https://discussions.apple.com/thread/8368663
 sudo pmset -b tcpkeepalive 0
 
 # Edit Mac-specific config to turn off tcpkeepalive and do-not-disturb while sleeping
 # keeps enhanced notifications from waking mac while sleeping, draining battery
-# Related: 
+# Related:
 # https://forums.macrumors.com/threads/psa-if-your-2015-or-2016-mbp-has-some-battery-drain-while-sleeping-here-is-the-fix.2026702/
 # https://apple.stackexchange.com/questions/253776/macbook-pro-13-with-retina-display-consumes-10-battery-overnight-with-the-lid-c
 # https://support.apple.com/en-us/HT201960
@@ -705,7 +743,7 @@ fi
 #############################################
 ### Install dotfiles repo
 #############################################
-# dotfiles for vs code, emacs, gitconfig, oh my zsh, etc. 
+# dotfiles for vs code, emacs, gitconfig, oh my zsh, etc.
 # git clone git@github.com:gricard/dotfiles.git
 # cd dotfiles
 
