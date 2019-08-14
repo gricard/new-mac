@@ -763,6 +763,7 @@ echo " - Install React Dev Tools in Chrome, Firefox, etc."
 echo " - Setup Time Machine with Drobo"
 echo " - System Prefs -> Bluetooth -> Advanced -> Allow Bluetooth devices to wake this computer"
 echo " - System Prefs -> Notifications -> Turn on Do Not Disturb... -> When the display is sleeping"
+echo " - System Prefs -> Security -> Require password immediately after sleep"
 echo
 echo ""
 echo ""
