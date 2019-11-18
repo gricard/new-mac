@@ -340,9 +340,6 @@ defaults write com.apple.dock minimize-to-application -bool true
 # Don’t show recent applications in Dock
 defaults write com.apple.dock show-recents -bool false
 
-# Avoid creating .DS_Store files on network volumes
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-
 # Show the ~/Library folder
 chflags nohidden ~/Library
 
