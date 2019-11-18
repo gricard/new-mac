@@ -184,12 +184,16 @@ echo "Starting brew app install..."
 ### Developer Tools
 brew cask install iterm2
 brew cask install dash
-brew install node
 brew install yarn
 brew cask install virtualbox
 brew install awscli
 npm i -g --no-optional gatsby-cli
 npm install -g @aws-amplify/cli@multienv
+
+## Install NodeJS via nvm
+brew install nvm
+mkdir ~/.nvm
+nvm install 12
 
 ### Command line tools - install new ones, update others to latest version
 brew install git  # upgrade to latest
