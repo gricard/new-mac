@@ -51,7 +51,7 @@ cecho "###############################################" $red
 echo ""
 
 # Set continue to false by default.
-CONTINUE=false
+CONTINUE=true
 
 echo ""
 cecho "Have you read through the script you're about to run and " $red
@@ -84,9 +84,13 @@ sudo scutil --set HostName $hostName
 sudo scutil --set LocalHostName $hostName
 sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string $hostName
 
-# Menu bar: show remaining battery time (on pre-10.8); hide percentage
-defaults write com.apple.menuextra.battery ShowPercent -string "YES"
-#defaults write com.apple.menuextra.battery ShowTime -string "YES"
+# Menu bar: show remaining battery %
+# this file is named with a hostid that varies by installation, there should only be one file that matches this loop
+# this also seems to require a restart. it's not updated by terminating SystemUIServer, or Control Center, or Finder.
+for plist in ~/Library/Preferences/ByHost/com.apple.controlcenter.*.plist; do                                      
+   plutil -replace BatteryShowPercentage -integer 1 "$plist"
+done
+
 
 ##############################
 # Prerequisite: Install Brew #
@@ -96,14 +100,19 @@ echo "Installing brew..."
 
 if test ! $(which brew)
 then
-	## Don't prompt for confirmation when installing homebrew
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null
+  ## Don't prompt for confirmation when installing homebrew
+#  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+    eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# Latest brew, install brew cask
+# Latest brew, install brew 
 brew upgrade
 brew update
-brew tap caskroom/cask
+
+# not necessary anymore
+#brew tap homebrew/cask
 
 
 #############################################
@@ -182,14 +191,16 @@ git config --global user.name "$gitName"
 echo "Starting brew app install..."
 
 ### Developer Tools
-brew cask install iterm2
-brew cask install dash
+#brew cask install iterm2
+#brew cask install dash
 brew install node
 brew install yarn
-brew cask install virtualbox
-brew install awscli
-npm i -g --no-optional gatsby-cli
-npm install -g @aws-amplify/cli@multienv
+brew install orbstack
+brew install docker
+#brew install virtualbox
+#brew install awscli
+#npm i -g --no-optional gatsby-cli
+#npm install -g @aws-amplify/cli@multienv
 
 ### Command line tools - install new ones, update others to latest version
 brew install git  # upgrade to latest
@@ -199,30 +210,35 @@ brew install trash  # move to osx trash instead of rm
 brew install less
 
 ### Dev Editors
-brew cask install visual-studio-code
-#brew cask install phpstorm #installs 2018.x
+brew install visual-studio-code
+#brew install phpstorm #installs 2018.x
+brew install --cask jetbrains-toolbox
+brew install textmate
 
 ### Browsers
-brew cask install google-chrome
-brew cask install firefox
-brew cask install brave-browser
+brew install google-chrome
+brew install firefox
+brew install brave-browser
+
 
 ### Productivity
-brew cask install alfred
-brew cask install dropbox
-brew cask install spectacle
-brew cask install bartender
+#brew cask install alfred
+brew install dropbox
+brew install rectangle # replaced spectacle
+brew install hiddenbar # replaced bartender
+brew install slack
+
 
 ### Quicklook plugins https://github.com/sindresorhus/quick-look-plugins
-brew cask install qlcolorcode # syntax highlighting in preview
-brew cask install qlstephen  # preview plaintext files without extension
-brew cask install qlmarkdown  # preview markdown files
-brew cask install quicklook-json  # preview json files
-brew cask install epubquicklook  # preview epubs, make nice icons
-brew cask install quicklook-csv  # preview csvs
+#brew cask install qlcolorcode # syntax highlighting in preview
+#brew cask install qlstephen  # preview plaintext files without extension
+#brew cask install qlmarkdown  # preview markdown files
+#brew cask install quicklook-json  # preview json files
+#brew cask install epubquicklook  # preview epubs, make nice icons
+#brew cask install quicklook-csv  # preview csvs
 
 # Utilities
-brew cask install homebrew/cask-drivers/drobo-dashboard
+#brew cask install homebrew/cask-drivers/drobo-dashboard
 
 ### Run Brew Cleanup
 brew cleanup
@@ -230,28 +246,34 @@ brew cleanup
 
 ### Fix Dock
 brew install dockutil
-dockutil --remove Mail --no-restart
-dockutil --remove Siri --no-restart
 dockutil --remove Launchpad --no-restart
-dockutil --remove Contacts --no-restart
-dockutil --remove Calendar --no-restart
-dockutil --remove Notes --no-restart
-dockutil --remove Reminders --no-restart
+dockutil --remove Messages --no-restart
+dockutil --remove Mail --no-restart
 dockutil --remove Maps --no-restart
 dockutil --remove Photos --no-restart
-dockutil --remove Messages --no-restart
 dockutil --remove FaceTime --no-restart
+dockutil --remove Contacts --no-restart
+dockutil --remove Reminders --no-restart
+dockutil --remove Notes --no-restart
+dockutil --remove Freeform --no-restart
+dockutil --remove TV --no-restart
+dockutil --remove Music --no-restart
 dockutil --remove News --no-restart
+dockutil --remove Siri --no-restart
 dockutil --remove iTunes --no-restart
+dockutil --remove Keynote --no-restart
+dockutil --remove Numbers --no-restart
+dockutil --remove Pages --no-restart
 dockutil --remove App\ Store --no-restart
 dockutil --add /Applications/Google\ Chrome.app --after Safari --no-restart
 dockutil --add /Applications/Firefox.app --after Google\ Chrome --no-restart
 dockutil --add /Applications/Brave\ Browser.app --after Firefox--no-restart
 dockutil --add /Applications/Visual\ Studio\ Code.app --after Brave\ Browser --no-restart
 dockutil --add /Applications/Utilities/Terminal.app --after Firefox --no-restart
-dockutil --add /Applications/iTerm.app --after Terminal --no-restart
+#dockutil --add /Applications/iTerm.app --after Terminal --no-restart
 dockutil --add /Applications/Utilities/Disk\ Utility.app --after Terminal --no-restart
-dockutil --add /Applications/Utilities/Activity\ Monitor.app --after Diskutil
+dockutil --add /Applications/Utilities/Activity\ Monitor.app --after "Disk Utility" --no-restart
+dockutil --add /Applications/TextMate --after "Activity Monitor"
 ### make sure the last dockutil call does not have --no-restart
 
 #############################################
@@ -282,6 +304,9 @@ fi
 #############################################
 ### Set OSX Preferences - Borrowed from https://github.com/mathiasbynens/dotfiles/blob/master/.macos
 #############################################
+
+# xcode license
+sudo xcodebuild -license accept
 
 # fix xcodebuild on command line
 # see: https://stackoverflow.com/questions/17980759/xcode-select-active-developer-directory-error/17980786#17980786
@@ -354,15 +379,15 @@ defaults write com.apple.finder QLEnableTextSelection -bool true
 /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 
-# Remove cmd-space shortcut from Spotlight so we can use it for Alfred
-/usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.symbolichotkeys.plist -c "Set AppleSymbolicHotKeys:64:enabled false"
+## Remove cmd-space shortcut from Spotlight so we can use it for Alfred
+#/usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.symbolichotkeys.plist -c "Set AppleSymbolicHotKeys:64:enabled false"
 
 # turn off the finder search shortcut also
 #/usr/libexec/PlistBuddy ~/Library/Preferences/com.apple.symbolichotkeys.plist -c "Set AppleSymbolicHotKeys:65:enabled false"
 
 # credit for these scripts: https://gist.github.com/kaloprominat/6111584
-# start spectacle on login (find a way to do this, it doesn't work)
-osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
+# start rectangle on login (find a way to do this, it doesn't work)
+#osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
 # delete login item
 #osascript -e 'tell application "System Events" to delete login item "itemname"'
 # list loginitems
@@ -372,9 +397,9 @@ osascript -e 'tell application "System Events" to make login item at end with pr
 # I can't figure out how Bartender sets this up. It's not adding it to the System Events login items
 # and it's not adding it to loginwindow's defaults, either.
 # this does not work:
-# defaults write loginwindow AutoLaunchedApplicationDictionary -array-add '{ "Name" = "Notes" ; "Path" = "/Applications/Bartender\ 3.app"; "Hide" = 0; }'
+# defaults write loginwindow AutoLaunchedApplicationDictionary -array-add '{ "Name" = "Notes" ; "Path" = "/Applications/Bartender\ 5.app"; "Hide" = 0; }'
 # but this does, although it does not trigger the "launch at login" checkbox in Bartender's preferences
-osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Bartender\ 3.app", hidden:false}'
+#osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Bartender\\ 5.app", hidden:false}'
 
 
 ###############################################################################
@@ -473,7 +498,7 @@ defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
 # Increase trackpad speed
-defaults write NSGlobalDomain com.apple.trackpad.scaling -int 2.5
+defaults write NSGlobalDomain com.apple.trackpad.scaling -int 2
 
 # Turn off trackpad click noise
 defaults write com.apple.AppleMultitouchTrackpad ActuationStrength -int 1
@@ -512,78 +537,79 @@ defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 # Disable the all too sensitive backswipe on trackpads
 defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
 
-###############################################################################
-# iTerm 2                                                                     #
-###############################################################################
-# this is a bit of a messy process to ensure that iTerm will use the left option key as the meta key
-# but it is the only way I found to do it with consistently reproducible results
-# if you don't do the syncs, defaults read calls and waiting, then it does not always honor the settings
-# this was a pain in the ass to figure out - GR
-echo "Attempting to setup defaults for iTerm now. The app will open while this process runs."
-echo "Please do not touch the keyboard or mouse until this process completes."
-sleep 1
-# the defaults file is empty right now
-# create initial defaults for iterm so it will not ask when we quit it with this script
-defaults write com.googlecode.iterm2 PromptOnQuit -bool false
-# and turn on automatic checks so we're not bothered with that dialog either
-defaults write com.googlecode.iterm2 SUEnableAutomaticChecks -int 1
-# start iterm and exit it, so that it fills in the rest of the defaults
-open /Applications/iTerm.app &
-# wait for iTerm to start up...
-echo "Wait for iTerm to setup its default prefs"
-sleep 3
-# flush filesystem (not sure if this even does anything)
-sync
-# see what it wrote (in case a read causes anything cached to be flushed)
-numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
-#echo "num defaults read: $numDefaults"
-# kill it since the defaults plist should be filled in now
-killall iTerm2
-# wait for it to die
-pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
-#echo "Pids: $pids"
-while [ $pids -gt 0 ]
-do
-  #echo "still running..."
-  sleep 1
-  pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
-done
-# force FS flush
-sync
-# now we can alter prefs via PlistBuddy
-ITERM=$HOME/Library/Preferences/com.googlecode.iterm2.plist
-# set the left option key to Esc+ (so it will work as meta key properly)
-# for some reason the defaults plist is not written immediately,
-# so we have to keep trying to update it with PlistBuddy
-echo -n "Attempting to set meta key for iTerm2"
-counter=0
-maxTries=20
-while [ $counter -lt $maxTries ]
-do
-  echo -n "."
-  sleep 1
-  # credit: https://raw.githubusercontent.com/therockstorm/dotfiles/master/init.sh
-  # and for some reason the stderr redirect here still doesn't always redirect the error output... awesome.
-  /usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Option Key Sends" 2' $ITERM 2>&1>/dev/null
-  if [ $? -eq 0 ]
-  then
-    echo " done"
-    break
-  fi
-  counter=`expr $counter + 1`
-done
-# There were still cases where it was in the defaults plist, but not honored by the app
-# so we do a few more things here to try and ensure that the defaults are actually honored
-#
-# let's try a sync again just in case
-sync
-# and another read to see if we reset any cache
-numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
-#echo "num defaults read: $numDefaults"
-# NOW the setting should be saved properly
 
-# reset the close confirmation dialog, since I do want it to ask
-defaults write com.googlecode.iterm2 PromptOnQuit -bool true
+##################################################################################
+#### iTerm 2                                                                     #
+##################################################################################
+#### this is a bit of a messy process to ensure that iTerm will use the left option key as the meta key
+#### but it is the only way I found to do it with consistently reproducible results
+#### if you don't do the syncs, defaults read calls and waiting, then it does not always honor the settings
+#### this was a pain in the ass to figure out - GR
+###echo "Attempting to setup defaults for iTerm now. The app will open while this process runs."
+###echo "Please do not touch the keyboard or mouse until this process completes."
+###sleep 1
+#### the defaults file is empty right now
+#### create initial defaults for iterm so it will not ask when we quit it with this script
+###defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+#### and turn on automatic checks so we're not bothered with that dialog either
+###defaults write com.googlecode.iterm2 SUEnableAutomaticChecks -int 1
+#### start iterm and exit it, so that it fills in the rest of the defaults
+###open /Applications/iTerm.app &
+#### wait for iTerm to start up...
+###echo "Wait for iTerm to setup its default prefs"
+###sleep 3
+#### flush filesystem (not sure if this even does anything)
+###sync
+#### see what it wrote (in case a read causes anything cached to be flushed)
+###numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
+####echo "num defaults read: $numDefaults"
+#### kill it since the defaults plist should be filled in now
+###killall iTerm2
+#### wait for it to die
+###pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
+####echo "Pids: $pids"
+###while [ $pids -gt 0 ]
+###do
+###  #echo "still running..."
+###  sleep 1
+###  pids=`ps uawwx | grep iTerm2 | grep -v grep | wc -l`
+###done
+#### force FS flush
+###sync
+#### now we can alter prefs via PlistBuddy
+###ITERM=$HOME/Library/Preferences/com.googlecode.iterm2.plist
+#### set the left option key to Esc+ (so it will work as meta key properly)
+#### for some reason the defaults plist is not written immediately,
+#### so we have to keep trying to update it with PlistBuddy
+###echo -n "Attempting to set meta key for iTerm2"
+###counter=0
+###maxTries=20
+###while [ $counter -lt $maxTries ]
+###do
+###  echo -n "."
+###  sleep 1
+###  # credit: https://raw.githubusercontent.com/therockstorm/dotfiles/master/init.sh
+###  # and for some reason the stderr redirect here still doesn't always redirect the error output... awesome.
+###  /usr/libexec/PlistBuddy -c 'Set :"New Bookmarks":0:"Option Key Sends" 2' $ITERM 2>&1>/dev/null
+###  if [ $? -eq 0 ]
+###  then
+###    echo " done"
+###    break
+###  fi
+###  counter=`expr $counter + 1`
+###done
+#### There were still cases where it was in the defaults plist, but not honored by the app
+#### so we do a few more things here to try and ensure that the defaults are actually honored
+####
+#### let's try a sync again just in case
+###sync
+#### and another read to see if we reset any cache
+###numDefaults=`defaults read com.googlecode.iterm2 | wc -l`
+####echo "num defaults read: $numDefaults"
+#### NOW the setting should be saved properly
+###
+#### reset the close confirmation dialog, since I do want it to ask
+###defaults write com.googlecode.iterm2 PromptOnQuit -bool true
 
 
 ###############################################################################
@@ -630,7 +656,7 @@ while [ $counter -lt $maxTries ]
 do
   echo -n "."
   sleep 1
-  /usr/libexec/PlistBuddy -c "Add :Window\ Settings:Basic:useOptionAsMetaKey bool true" ~/Library/Preferences/com.apple.Terminal.plist
+  plutil -replace "Window Settings.Basic.useOptionAsMetaKey" -integer 1 ~/Library/Preferences/com.apple.Terminal.plist
   if [ $? -eq 0 ]
   then
     echo " done"
@@ -648,94 +674,97 @@ numDefaults=`defaults read com.apple.Terminal | wc -l`
 #echo "num defaults read: $numDefaults"
 # NOW the setting should be saved properly
 
+# TODO would be nice to have the font size increase and window size as well
+
+
 ###############################################################################
 # Energy settings                                                             #
 ###############################################################################
 
-#### better battery life while sleeping
-#
-# pmset -a = all power modes , -b = battery , -c = charger / wall power
-#
-# More info:
-# https://www.lifewire.com/change-mac-sleep-settings-2260804
-# https://www.dssw.co.uk/reference/pmset.html
-#
-# hibernatemode 3 = writes memory to disk, but keeps ram powered , 25 = writes to disk and does not power memory (takes longer to wake)
-#
-# default for portables is "hibernatemode 3"
-#sudo pmset -a hibernatemode 25 standby 0 autopoweroff 0
-# although, this makes it take much longer to wake from sleep, and sometimes it logs out entirely
-# benefits are not apparent
-
-# so stick with mode 3
-sudo pmset -a hibernatemode 3
-
-# tell mac to hibernate after a set time interval
-sudo pmset -a standby 1
-# battery % considered "high" (default)
-#sudo pmset -a highstandbythreshold 50
-# num seconds to delay before hibernating when mac is put to sleep and battery has more than 'highstandbythreshold' % battery
-sudo pmset -a standbydelayhigh 600 # wait 10 minutes and then hibernate
-# num seconds to delay before hibernating when battery is < 50%
-sudo pmset -a standbydelaylow 120 # wait 2 minutes on low power
-
-# do not automatically hibernate
-sudo pmset -a autopoweroff 0
-
-# do not wake on "magic packet" over ethernet
-sudo pmset -a womp 0
-
-# do not wake when power source changes
-sudo pmset -a acwake 0
-
-# no sharing network services when sleeping
-sudo pmset -a networkoversleep 0
-
-# turn off Power Nap
-# more info here: https://www.howtogeek.com/277742/what-is-power-nap-in-macos/
-sudo pmset -a powernap 0
-
-# turn display off after 10 minutes on battery
-sudo pmset -b displaysleep 10
-
-# go to sleep after 20 minutes on battery
-sudo pmset -b sleep 20
-
-# turn off option that wakes mac when devices with same apple id are near
-# https://www.reddit.com/r/hackintosh/comments/9jfa8w/mojave_new_pmset_options/
-sudo pmset -a proximitywake 0
-
-# go to sleep after an hour when plugged in
-sudo systemsetup -setsleep 60
-
-# put display to sleep after 10 minutes when plugged in
-sudo systemsetup -setdisplaysleep 10
-
-# Turn off feature to preserve battery life while sleeping
-# https://discussions.apple.com/thread/8368663
-sudo pmset -b tcpkeepalive 0
-
-# Edit Mac-specific config to turn off tcpkeepalive and do-not-disturb while sleeping
-# keeps enhanced notifications from waking mac while sleeping, draining battery
-# Related:
-# https://forums.macrumors.com/threads/psa-if-your-2015-or-2016-mbp-has-some-battery-drain-while-sleeping-here-is-the-fix.2026702/
-# https://apple.stackexchange.com/questions/253776/macbook-pro-13-with-retina-display-consumes-10-battery-overnight-with-the-lid-c
-# https://support.apple.com/en-us/HT201960
-csrutil status | grep enabled > /dev/null
-if [ $? -eq 0 ]
-then
-  echo "Cannot disable tcpkeepalive properly"
-  echo "Please reboot and hold command-r to start the recovery tool"
-  echo "When it loads, open the terminal and type `csrutil disable` and then reboot and try again"
-  echo "When finished, reboot into the recovery tool, and enter 'csrutil enable' in the terminal again"
-else
-  MODEL=`ioreg -l | awk '/board-id/{print $4}' | sed 's/[<">]//g'`
-  echo "Altering configuration for model $MODEL"
-  echo "Disable network wake when sleeping"
-  sudo /usr/libexec/PlistBuddy -c "Set :IOPlatformPowerProfile:TCPKeepAliveDuringSleep false" /System/Library/Extensions/IOPlatformPluginFamily.kext/Contents/PlugIns/X86PlatformPlugin.kext/Contents/Resources/$MODEL.plist
-  echo "Enable Do Not Disturb while display is asleep"
-  sudo /usr/libexec/PlistBuddy -c "Set :IOPlatformPowerProfile:DNDWhileDisplaySleeps true" /System/Library/Extensions/IOPlatformPluginFamily.kext/Contents/PlugIns/X86PlatformPlugin.kext/Contents/Resources/$MODEL.plist
-fi
+####### better battery life while sleeping
+####
+#### pmset -a = all power modes , -b = battery , -c = charger / wall power
+####
+#### More info:
+#### https://www.lifewire.com/change-mac-sleep-settings-2260804
+#### https://www.dssw.co.uk/reference/pmset.html
+####
+#### hibernatemode 3 = writes memory to disk, but keeps ram powered , 25 = writes to disk and does not power memory (takes longer to wake)
+####
+#### default for portables is "hibernatemode 3"
+####sudo pmset -a hibernatemode 25 standby 0 autopoweroff 0
+#### although, this makes it take much longer to wake from sleep, and sometimes it logs out entirely
+#### benefits are not apparent
+###
+#### so stick with mode 3
+###sudo pmset -a hibernatemode 3
+###
+#### tell mac to hibernate after a set time interval
+###sudo pmset -a standby 1
+#### battery % considered "high" (default)
+####sudo pmset -a highstandbythreshold 50
+#### num seconds to delay before hibernating when mac is put to sleep and battery has more than 'highstandbythreshold' % battery
+###sudo pmset -a standbydelayhigh 600 # wait 10 minutes and then hibernate
+#### num seconds to delay before hibernating when battery is < 50%
+###sudo pmset -a standbydelaylow 120 # wait 2 minutes on low power
+###
+#### do not automatically hibernate
+###sudo pmset -a autopoweroff 0
+###
+#### do not wake on "magic packet" over ethernet
+###sudo pmset -a womp 0
+###
+#### do not wake when power source changes
+###sudo pmset -a acwake 0
+###
+#### no sharing network services when sleeping
+###sudo pmset -a networkoversleep 0
+###
+#### turn off Power Nap
+#### more info here: https://www.howtogeek.com/277742/what-is-power-nap-in-macos/
+###sudo pmset -a powernap 0
+###
+#### turn display off after 10 minutes on battery
+###sudo pmset -b displaysleep 10
+###
+#### go to sleep after 20 minutes on battery
+###sudo pmset -b sleep 20
+###
+#### turn off option that wakes mac when devices with same apple id are near
+#### https://www.reddit.com/r/hackintosh/comments/9jfa8w/mojave_new_pmset_options/
+###sudo pmset -a proximitywake 0
+###
+#### go to sleep after an hour when plugged in
+###sudo systemsetup -setsleep 60
+###
+#### put display to sleep after 10 minutes when plugged in
+###sudo systemsetup -setdisplaysleep 10
+###
+#### Turn off feature to preserve battery life while sleeping
+#### https://discussions.apple.com/thread/8368663
+###sudo pmset -b tcpkeepalive 0
+###
+#### Edit Mac-specific config to turn off tcpkeepalive and do-not-disturb while sleeping
+#### keeps enhanced notifications from waking mac while sleeping, draining battery
+#### Related:
+#### https://forums.macrumors.com/threads/psa-if-your-2015-or-2016-mbp-has-some-battery-drain-while-sleeping-here-is-the-fix.2026702/
+#### https://apple.stackexchange.com/questions/253776/macbook-pro-13-with-retina-display-consumes-10-battery-overnight-with-the-lid-c
+#### https://support.apple.com/en-us/HT201960
+###csrutil status | grep enabled > /dev/null
+###if [ $? -eq 0 ]
+###then
+###  echo "Cannot disable tcpkeepalive properly"
+###  echo "Please reboot and hold command-r to start the recovery tool"
+###  echo "When it loads, open the terminal and type `csrutil disable` and then reboot and try again"
+###  echo "When finished, reboot into the recovery tool, and enter 'csrutil enable' in the terminal again"
+###else
+###  MODEL=`ioreg -l | awk '/board-id/{print $4}' | sed 's/[<">]//g'`
+###  echo "Altering configuration for model $MODEL"
+###  echo "Disable network wake when sleeping"
+###  sudo /usr/libexec/PlistBuddy -c "Set :IOPlatformPowerProfile:TCPKeepAliveDuringSleep false" /System/Library/Extensions/IOPlatformPluginFamily.kext/Contents/PlugIns/X86PlatformPlugin.kext/Contents/Resources/$MODEL.plist
+###  echo "Enable Do Not Disturb while display is asleep"
+###  sudo /usr/libexec/PlistBuddy -c "Set :IOPlatformPowerProfile:DNDWhileDisplaySleeps true" /System/Library/Extensions/IOPlatformPluginFamily.kext/Contents/PlugIns/X86PlatformPlugin.kext/Contents/Resources/$MODEL.plist
+###fi
 
 #############################################
 ### Install dotfiles repo
@@ -750,13 +779,9 @@ echo
 echo
 echo "Additional manual setup (for now):"
 echo " - adjust the screen resolution manually (for now)"
-echo " - enable full disk access, etc. for iTerm"
 echo " - install the Sync Settings VS Code extension and connect to your gist!"
-echo " - download phpstorm 2017.1: https://confluence.jetbrains.com/display/PhpStorm/Previous+PhpStorm+Releases"
-echo "   - don't modify the bin/phpstorm.vmoptions memory usage settings until after you open it once or it gets corrupted!"
-echo " - set alfred to use cmd-space in prefs, and to enable accessibility controls & full disk access"
+echo " - Install JetBrains IDEs via Toolbox"
 echo " - Install React Dev Tools in Chrome, Firefox, etc."
-echo " - Setup Time Machine with Drobo"
 echo " - System Prefs -> Bluetooth -> Advanced -> Allow Bluetooth devices to wake this computer"
 echo " - System Prefs -> Notifications -> Turn on Do Not Disturb... -> When the display is sleeping"
 echo " - System Prefs -> Security -> Require password immediately after sleep"
